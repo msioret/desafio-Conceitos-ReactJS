@@ -1,34 +1,45 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import api from './services/api';
 
 import "./styles.css";
 
 function App() {
-  const [projects, setprojects] = useState([]);
+  const [repositories, setRepositories] = useState([]);//repositories é um array de obj!
 
+    useEffect(() => {
+      api.get('/repositories').then(response =>
+        setRepositories(response.data)        //lleno mi vector
+      );
+      },[]); 
 
   async function handleAddRepository() {
-    // TODO
+    const response = await api.post('/repositories', {
+      title: 'new-repository',
+      url: 'https://github.com/rocketseat/new-repository',
+      techs: ['Node.js', 'ReactJS']
+    });
+    setRepositories([...repositories, response.data]);//na data tenho o que preciso
+    console.log(response.data.title);
   }
-
   async function handleRemoveRepository(id) {
-    // TODO
-  }
+   await api.delete(`/repositories/${id}`).then(response => console.log(response.status));// posso usar o await mesmo se a função não retorna nada-Ojo!
+
+   setRepositories(repositories.filter(
+     repository => repository.id !== id
+   ));
+  } 
 
   return (
     <div>
       <ul data-testid="repository-list">
-        <li>           
-          {
-            api.get('projects').then(response => {
-            setprojects(response,data);
-            })
-          };
-
-          <button onClick={() => handleRemoveRepository(1)}>
-            Remover
-          </button>
-        </li>
+        {repositories.map(repository => 
+          <li key={repository.id}>            
+            {repository.title}
+            <button onClick={() => handleRemoveRepository(repository.id)}>
+               Remover
+            </button>
+          </li>
+        )}
       </ul>
 
       <button onClick={handleAddRepository}>Adicionar</button>
