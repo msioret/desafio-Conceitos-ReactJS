@@ -24,9 +24,11 @@ function App() {
   async function handleRemoveRepository(id) {
    await api.delete(`/repositories/${id}`).then(response => console.log(response.status));// posso usar o await mesmo se a função não retorna nada-Ojo!
 
-   setRepositories(repositories.filter(
+   const newRepositories = repositories.filter(
      repository => repository.id !== id
-   ));
+   );
+
+   setRepositories(newRepositories);
   } 
 
   return (
